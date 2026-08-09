@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import type { Precision, ComputeDevice } from '../../electron/main/settings-store'
 
 export type UiScale = 'small' | 'medium' | 'large' | 'very-large'
 export type BackendStatus = 'not_started' | 'starting' | 'ready' | 'error'
@@ -148,6 +149,12 @@ interface AppState {
   lightSettings: LightSettings
   setLightSettings: (settings: LightSettings) => void
 
+  // Performance settings (persisted)
+  device: ComputeDevice
+  precision: Precision
+  setDevice: (d: ComputeDevice) => void
+  setPrecision: (p: Precision) => void
+
   // Actions
   initApp: () => Promise<void>
   setCurrentJob: (job: GenerationJob | null) => void
@@ -250,6 +257,11 @@ export const useAppStore = create<AppState>()(
       lightSettings: DEFAULT_LIGHT_SETTINGS,
       setLightSettings: (settings) => set({ lightSettings: settings }),
 
+      device: 'auto',
+      setDevice: (d) => set({ device: d }),
+      precision: 'auto',
+      setPrecision: (p) => set({ precision: p }),
+
       currentJob: null,
       selectedImagePath: null,
       setSelectedImagePath: (path) => set({ selectedImagePath: path }),
@@ -304,6 +316,8 @@ export const useAppStore = create<AppState>()(
         useAtkinsonFont: state.useAtkinsonFont,
         uiScale: state.uiScale,
         lightSettings: state.lightSettings,
+        device: state.device,
+        precision: state.precision,
       }),
     }
   )

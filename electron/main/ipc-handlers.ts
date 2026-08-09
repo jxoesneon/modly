@@ -35,6 +35,7 @@ import {
 import { validateInstallManifest } from './extension-install-utils'
 import { registerWorkspaceAssetLibraryIpcHandlers } from './artifact-registry-service'
 import { updatesSupported } from './updater'
+import { getChipInfo } from './chip-detection'
 
 type WindowGetter = () => BrowserWindow | null
 const pExecFile = promisify(execFile)
@@ -45,11 +46,20 @@ interface GpuInfo {
   sm: number
   cudaVersion: number
   accelerator: 'cuda' | 'mps' | 'cpu'
+  chipFamily?: string
+  chipTier?: number
+  brandString?: string
+  bfloat16?: boolean
 }
 
 function detectGpuInfo(): Promise<GpuInfo> {
   if (process.platform === 'darwin' && process.arch === 'arm64') {
-    return Promise.resolve({ sm: 0, cudaVersion: 0, accelerator: 'mps' })
+    const chip = getChipInfo()
+    return Promise.resolve({
+      sm: 0, cudaVersion: 0, accelerator: 'mps',
+      chipFamily: chip.family, chipTier: chip.tier,
+      brandString: chip.brand, bfloat16: chip.bfloat16,
+    })
   }
 
   return new Promise((resolve) => {
@@ -682,7 +692,7 @@ export function setupIpcHandlers(pythonBridge: PythonBridge, getWindow: WindowGe
     return getSettings(app.getPath('userData'))
   })
 
-  ipcMain.handle('settings:set', async (_event, patch: { modelsDir?: string; workspaceDir?: string; extensionsDir?: string; hfToken?: string }) => {
+  ipcMain.handle('settings:set', async (_event, patch: { modelsDir?: string; workspaceDir?: string; workflowsDir?: string; extensionsDir?: string; hfToken?: string; device?: string; precision?: string }) => {
     const updated = setSettings(app.getPath('userData'), patch)
     // Keep main-process env in sync so child processes spawned after token change inherit it
     if (patch.hfToken !== undefined) {

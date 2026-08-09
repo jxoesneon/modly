@@ -6,8 +6,9 @@ import { IntegrationsSection } from './components/IntegrationsSection'
 import { AgentSection } from './components/AgentSection'
 import { ApplicationSection } from './components/ApplicationSection'
 import { AccessibilitySection } from './components/AccessibilitySection'
+import { PerformanceSection } from './components/PerformanceSection'
 
-type Section = 'application' | 'storage' | 'integrations' | 'accessibility' | 'agent' | 'logs' | 'about'
+type Section = 'application' | 'storage' | 'integrations' | 'accessibility' | 'performance' | 'agent' | 'logs' | 'about'
 
 const SECTIONS: { id: Section; label: string; icon: JSX.Element }[] = [
   {
@@ -51,6 +52,16 @@ const SECTIONS: { id: Section; label: string; icon: JSX.Element }[] = [
         <path d="M19 9l-7 1-7-1" />
         <path d="M12 10v6" />
         <path d="M9 22l3-6 3 6" />
+      </svg>
+    )
+  },
+  {
+    id: 'performance',
+    label: 'Performance',
+    icon: (
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M12 2a10 10 0 1 0 10 10" />
+        <path d="M12 6v6l4 2" />
       </svg>
     )
   },
@@ -125,6 +136,7 @@ export default function SettingsPage(): JSX.Element {
           {section === 'storage'       && <StorageSection />}
           {section === 'integrations'  && <IntegrationsSection />}
           {section === 'accessibility' && <AccessibilitySection />}
+          {section === 'performance'   && <PerformanceSection />}
           {section === 'agent'         && <AgentSection />}
           {section === 'logs'          && <LogsSection />}
           {section === 'about'         && <AboutSection />}

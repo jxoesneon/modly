@@ -80,6 +80,10 @@ class ExtensionProcess:
         # runner.py extracts the node id from MODEL_DIR's trailing path component.
         if self.model_dir is not None:
             env["MODEL_DIR"] = str(self.model_dir)
+        # Forward precision/device settings so extension subprocesses inherit
+        # the user's performance preferences from the main FastAPI process.
+        env["MODLY_DEVICE"]    = os.environ.get("MODLY_DEVICE", "auto")
+        env["MODLY_PRECISION"] = os.environ.get("MODLY_PRECISION", "auto")
         # Extension venvs are based on python-embed which ships without a CA bundle.
         # Only set SSL_CERT_FILE if not already provided (preserves corporate/custom certs).
         if "SSL_CERT_FILE" not in env:
@@ -289,6 +293,8 @@ class ExtensionProcess:
             "image_b64":   base64.b64encode(image_bytes).decode(),
             "params":      params,
             "outputs_dir": str(self.outputs_dir) if self.outputs_dir else None,
+            "device":      os.environ.get("MODLY_DEVICE", "auto"),
+            "precision":   os.environ.get("MODLY_PRECISION", "auto"),
         })
 
         # Grace period after sending a cooperative cancel before hard-killing

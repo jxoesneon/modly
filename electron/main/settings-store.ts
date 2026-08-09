@@ -1,6 +1,9 @@
 import { join } from 'path'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 
+export type Precision = 'auto' | 'fp16' | 'bf16' | 'fp32'
+export type ComputeDevice = 'auto' | 'mps' | 'cuda0' | 'cuda1' | 'cpu'
+
 export interface AppSettings {
   modelsDir:        string
   workspaceDir:     string
@@ -8,6 +11,8 @@ export interface AppSettings {
   extensionsDir:    string
   dependenciesDir:  string
   hfToken?:         string
+  device?:          ComputeDevice
+  precision?:       Precision
 }
 
 function settingsPath(userData: string): string {
@@ -21,6 +26,8 @@ export function getSettings(userData: string): AppSettings {
     workflowsDir:     join(userData, 'workflows'),
     extensionsDir:    join(userData, 'extensions'),
     dependenciesDir:  join(userData, 'dependencies'),
+    device:           'auto',
+    precision:        'auto',
   }
 
   const file = settingsPath(userData)

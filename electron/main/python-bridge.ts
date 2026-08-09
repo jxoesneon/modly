@@ -59,6 +59,8 @@ export class PythonBridge {
         SELECTED_MODEL_ID:      process.env['SELECTED_MODEL_ID'] ?? '',
         HUGGING_FACE_HUB_TOKEN: this.resolveHfToken(),
         HF_TOKEN:               this.resolveHfToken(),
+        MODLY_DEVICE:           this.resolveDevice(),
+        MODLY_PRECISION:        this.resolvePrecision(),
       },
       // On Unix, put the bridge in its own process group so every subprocess
       // it spawns (extension runners, etc.) inherits that group. On shutdown
@@ -239,5 +241,13 @@ export class PythonBridge {
 
   private resolveHfToken(): string {
     return getSettings(app.getPath('userData')).hfToken ?? ''
+  }
+
+  private resolveDevice(): string {
+    return getSettings(app.getPath('userData')).device ?? 'auto'
+  }
+
+  private resolvePrecision(): string {
+    return getSettings(app.getPath('userData')).precision ?? 'auto'
   }
 }

@@ -34,6 +34,10 @@ MODLY_API_DIR = os.environ.get("MODLY_API_DIR", "")
 # MODEL_DIR is set by ExtensionProcess to match its own model_dir (composite node id path).
 # Falls back to MODELS_DIR/manifest_id for standalone/legacy use.
 _MODEL_DIR_OVERRIDE = os.environ.get("MODEL_DIR", "")
+# Precision/device settings forwarded from the main FastAPI process so the
+# generator can pick the right torch device and dtype without re-detecting.
+DEVICE    = os.environ.get("MODLY_DEVICE", "auto")
+PRECISION = os.environ.get("MODLY_PRECISION", "auto")
 
 # Inject Modly's api/ so generator.py can do:
 #   from services.generators.base import BaseGenerator, ...
@@ -159,6 +163,9 @@ def main() -> None:
                 _cancel[rid] = cancel_evt
                 image_bytes  = base64.b64decode(msg["image_b64"])
                 params       = msg.get("params", {})
+                # Inject device/precision from env or message
+                params.setdefault("device", msg.get("device", DEVICE))
+                params.setdefault("precision", msg.get("precision", PRECISION))
                 if msg.get("outputs_dir"):
                     gen.outputs_dir = Path(msg["outputs_dir"])
                     gen.outputs_dir.mkdir(parents=True, exist_ok=True)

@@ -41,6 +41,8 @@ async def generate_from_image(
     remesh: str = Form("quad"),
     enable_texture: bool = Form(False),
     texture_resolution: int = Form(1024),
+    device: str = Form("auto"),
+    precision: str = Form("auto"),
     params: str = Form("{}"),
 ):
     if not image.content_type or not image.content_type.startswith("image/"):
@@ -74,6 +76,8 @@ async def generate_from_image(
         "remesh":             remesh,
         "enable_texture":     enable_texture,
         "texture_resolution": texture_resolution,
+        "device":             device,
+        "precision":          precision,
         **model_params,
     }
 

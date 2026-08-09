@@ -384,6 +384,9 @@ async function executeExtensionNode(
     fd.append('enable_texture', 'false')
     fd.append('texture_resolution', '1024')
     fd.append('params', JSON.stringify({ ...effectiveParams, ...extraParams }))
+    const { device, precision } = useAppStore.getState()
+    fd.append('device', device)
+    fd.append('precision', precision)
 
     setRunState((s) => ({ ...s, blockProgress: 5, blockStep: 'Submitting to model…' }))
 

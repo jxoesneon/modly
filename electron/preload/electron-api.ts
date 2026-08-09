@@ -89,10 +89,10 @@ export function createElectronApi(ipcRenderer: IpcRendererLike, webFrame: WebFra
 
     // Settings
     settings: {
-      get: (): Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; hfToken?: string }> =>
-        ipcRenderer.invoke('settings:get') as Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; hfToken?: string }>,
-      set: (patch: { modelsDir?: string; workspaceDir?: string; workflowsDir?: string; extensionsDir?: string; hfToken?: string }): Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; hfToken?: string }> =>
-        ipcRenderer.invoke('settings:set', patch) as Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; hfToken?: string }>,
+      get: (): Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; dependenciesDir: string; hfToken?: string; device?: string; precision?: string }> =>
+        ipcRenderer.invoke('settings:get') as Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; dependenciesDir: string; hfToken?: string; device?: string; precision?: string }>,
+      set: (patch: { modelsDir?: string; workspaceDir?: string; workflowsDir?: string; extensionsDir?: string; hfToken?: string; device?: string; precision?: string }): Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; dependenciesDir: string; hfToken?: string; device?: string; precision?: string }> =>
+        ipcRenderer.invoke('settings:set', patch) as Promise<{ modelsDir: string; workspaceDir: string; workflowsDir: string; extensionsDir: string; dependenciesDir: string; hfToken?: string; device?: string; precision?: string }>,
     },
 
     // Cache

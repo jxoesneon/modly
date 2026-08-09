@@ -180,3 +180,47 @@ class BaseGenerator(ABC):
     ) -> None:
         if progress_cb:
             progress_cb(pct, step)
+
+    # ------------------------------------------------------------------ #
+    # Device / precision resolution
+    # ------------------------------------------------------------------ #
+
+    def _resolve_device(self, params: dict) -> str:
+        """Resolve the compute device from params or auto-detect."""
+        device = params.get("device", "auto")
+        if device == "auto":
+            import torch
+            if torch.backends.mps.is_available():
+                return "mps"
+            elif torch.cuda.is_available():
+                return "cuda"
+            return "cpu"
+        return device
+
+    def _resolve_dtype(self, params: dict):
+        """Resolve the torch dtype from precision param."""
+        import torch
+        precision = params.get("precision", "auto")
+        device = self._resolve_device(params)
+
+        if precision == "auto":
+            # FP16 on GPU, FP32 on CPU
+            if device in ("mps", "cuda"):
+                return torch.float16
+            return torch.float32
+        elif precision == "fp16":
+            return torch.float16
+        elif precision == "bf16":
+            # BF16 requires macOS 14+ on MPS
+            if device == "mps":
+                import platform
+                mac_ver = tuple(int(x) for x in platform.mac_ver()[0].split(".")[:2])
+                if mac_ver >= (14, 0):
+                    return torch.bfloat16
+                else:
+                    # BF16 not supported on this macOS, fall back to FP16
+                    return torch.float16
+            return torch.bfloat16
+        elif precision == "fp32":
+            return torch.float32
+        return torch.float32
