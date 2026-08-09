@@ -39,6 +39,29 @@ def get_extensions():
             "-arch",
             "arm64",
         ]
+        # Detect the actual Apple Silicon chip family and use the matching
+        # -mcpu target so the compiler can emit chip-specific instructions
+        # (e.g. M4 enables SME/SME2/BF16 ISA features).
+        _mcpu = "apple-m1"
+        if os.getenv("USE_NATIVE_ARCH", "1") == "1":
+            try:
+                import subprocess as _sp
+                _r = _sp.run(["sysctl", "-n", "hw.cpufamily"],
+                             capture_output=True, text=True, timeout=5)
+                if _r.returncode == 0 and _r.stdout.strip():
+                    _fam_val = int(_r.stdout.strip())
+                    _cpu_targets = {
+                        0x1b588bb3: "apple-m1",
+                        0xda33d83d: "apple-m2",
+                        0x8765edea: "apple-m3",
+                        0x6f5129ac: "apple-m4",
+                        0x17d5b93a: "apple-m4",
+                        0x75d4acb9: "apple-m4",
+                    }
+                    _mcpu = _cpu_targets.get(_fam_val, "apple-m1")
+            except Exception:
+                pass
+        cxx_flags.append(f"-mcpu={_mcpu}")
         if debug_mode:
             cxx_flags += ["-g", "-UNDEBUG"]
             extra_link_args += ["-O0", "-g"]
