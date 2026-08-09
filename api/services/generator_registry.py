@@ -162,7 +162,7 @@ class GeneratorRegistry:
         self._generators: Dict[str, BaseGenerator] = {}
         self._manifests:  Dict[str, dict]          = {}
         self._errors:     Dict[str, str]           = {}
-        self._active_id:  str = os.environ.get("SELECTED_MODEL_ID", "sf3d")
+        self._active_id:  str = os.environ.get("SELECTED_MODEL_ID") or "sf3d"
 
     def initialize(self) -> None:
         """Discovers and instantiates all extensions. Call at startup."""
@@ -240,6 +240,11 @@ class GeneratorRegistry:
 
     def get_active(self) -> BaseGenerator:
         """Returns the active generator. Downloads and loads if necessary."""
+        if not self._generators or self._active_id not in self._generators:
+            raise ValueError(
+                f"No generators loaded (active_id='{self._active_id}'). "
+                f"Available: {list(self._generators.keys())}"
+            )
         gen = self._generators[self._active_id]
         if not gen.is_loaded():
             if not gen.is_downloaded():
@@ -284,6 +289,8 @@ class GeneratorRegistry:
     # ------------------------------------------------------------------ #
 
     def active_status(self) -> dict:
+        if not self._generators or self._active_id not in self._generators:
+            return {"id": None, "name": None, "downloaded": False, "loaded": False}
         gen      = self._generators[self._active_id]
         manifest = self._manifests[self._active_id]
         return {
