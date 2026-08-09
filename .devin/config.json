@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "modly-cli-mcp": {
+      "command": "modly-mcp",
+      "args": [],
+      "disabled": false
+    }
+  }
+}
